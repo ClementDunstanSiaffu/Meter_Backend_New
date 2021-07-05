@@ -30,6 +30,7 @@ exports.get_amount = async (req,res)=>{
 }
 
 exports.get_unit = async (req,res)=>{
+    const passcode = req.params
     if (passcode == 1 || passcode == 0){
         const passcode = req.params
         const thatMeter = await Meter.findOne(passcode)
