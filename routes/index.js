@@ -7,7 +7,7 @@ let AmountA = null
 let AmountB = null
 
 exports.get_tokens = (req,res)=>{
-    if (req.params == "A"){
+    if (req.params == 1){
         const tokens = helper.arr_for_meterA()
         res.send(tokens)
     }else{
@@ -18,7 +18,7 @@ exports.get_tokens = (req,res)=>{
 
 exports.get_amount = async (req,res)=>{
     const passcode = req.params
-    if (passcode == "A" || passcode == "B"){
+    if (passcode == 1 || passcode == 0){
         const thatMeter = await Meter.findOne(passcode)
         const amount = thatMeter.amount
         res.status(200).json(amount)
@@ -30,7 +30,7 @@ exports.get_amount = async (req,res)=>{
 }
 
 exports.get_unit = async (req,res)=>{
-    if (passcode == "A" || passcode == "B"){
+    if (passcode == 1 || passcode == 0){
         const passcode = req.params
         const thatMeter = await Meter.findOne(passcode)
         const unit = thatMeter.unit
@@ -43,7 +43,7 @@ exports.get_unit = async (req,res)=>{
 
 exports.post_unit = async(req,res)=>{
     const obj = req.params
-    if (obj.passcode == "A" || obj.passcode == "B"){
+    if (obj.passcode == 1 || obj.passcode == 0){
         const meter = await Meter.findOne({passcode:obj.passcode})
         const docs = await Meter.find((err,docs)=>{return docs})
         const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
@@ -58,7 +58,7 @@ exports.post_unit = async(req,res)=>{
 
 exports.post_amount = async(req,res)=>{
     const obj = req.params
-    if(obj.passcode == "A" || obj.passcode == "B"){
+    if(obj.passcode == 1 || obj.passcode == 0){
         const meter = await Meter.findOne({passcode:obj.passcode})
         const docs = await Meter.find((err,docs)=>{return docs})
         const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
@@ -74,10 +74,11 @@ exports.post_amount = async(req,res)=>{
 exports.calculating_unit = (req,res)=>{
     const obj = req.params
     let val = null
-    if (obj.passcode == "A" || obj.passcode == "B"){
-        if(obj.passcode == "A"){
+    if (obj.passcode == 1 || obj.passcode == 0){
+        console.log("test 1")
+        if(obj.passcode == 1){
             val = unit_setter( obj.passcode,AmountA,obj.amount)
-        }else if (obj.passcode == "B"){
+        }else if (obj.passcode == 0){
             val = unit_setter( obj.passcode,AmountB,obj.amount)
         }
         if (val !== false || val !== null || typeof val !== "undefined"){
@@ -94,6 +95,7 @@ exports.calculating_unit = (req,res)=>{
             res.json({"tokens":"insufficient balance"})
         }
     }else{
+        console.log("test 2")
         res.json({"tokens":"unmatch password"})
     }
     
@@ -101,7 +103,7 @@ exports.calculating_unit = (req,res)=>{
 }
 exports.set_threshold = async(req,res)=>{
     const obj = req.params
-    if(obj.passcode == "A" || obj.passcode == "B"){
+    if(obj.passcode == 1 || obj.passcode == 0){
         const meter = await Meter.findOne({passcode:obj.passcode})
         const docs = await Meter.find((err,docs)=>{return docs})
         const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
@@ -115,9 +117,8 @@ exports.set_threshold = async(req,res)=>{
 }
 
 exports.get_threshold = async(req,res)=>{
-    console.log("hehheh")
     const obj = req.params
-    if(obj.passcode == "A" || obj.passcode == "B"){
+    if(obj.passcode == 1 || obj.passcode == 0){
         const meter = await Meter.findOne({passcode:obj.passcode})
         const threshold = meter.threshold
         res.json({"tokens":`${threshold}`})
@@ -128,7 +129,6 @@ exports.get_threshold = async(req,res)=>{
 }
 
 function unit_setter(passcode,meterAmount,amount){
-    console.log(meterAmount,"meterAmount")
     if(meterAmount !== null){
         if (meterAmount >= amount){
             const unit = parseInt(amount/300)
@@ -149,7 +149,7 @@ function unit_setter(passcode,meterAmount,amount){
                
             }
             let data = null
-            if (passcode == "A"){
+            if (passcode == 1){
                 meterAStatus = true
                 AmountA -= amount
                 const tokens = helper.arr_for_meterA()
@@ -158,9 +158,9 @@ function unit_setter(passcode,meterAmount,amount){
                         "unit":`${unit}`,
                         "status":"okay",
                         "amount":`${amount}`,
-                        "passcode":"A"
+                        "passcode":`${1}`
                         }
-            }else if (passcode == "B"){
+            }else if (passcode == 0){
                 meterBStatus = true
                 AmountB -= amount
                 const tokens = helper.arr_for_meterB()
@@ -169,7 +169,7 @@ function unit_setter(passcode,meterAmount,amount){
                     "unit":`${unit}`,
                     "status":"okay",
                     "amount":`${amount}`,
-                    "passcode":"B"
+                    "passcode":0
                 }
             }
             return data
