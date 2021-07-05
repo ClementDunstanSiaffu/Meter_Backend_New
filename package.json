@@ -1,12 +1,24 @@
 {
   "name": "meter_backend_new",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node app.js"
+    "start": "node app.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClementDunstanSiaffu/Meter_Backend_New.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ClementDunstanSiaffu/Meter_Backend_New/issues"
+  },
+  "homepage": "https://github.com/ClementDunstanSiaffu/Meter_Backend_New#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.13.2"
+  }
 }
