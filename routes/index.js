@@ -43,10 +43,10 @@ exports.get_unit = async (req,res)=>{
 
 exports.post_unit = async(req,res)=>{
     const obj = req.params
-    if (obj.passcode == 1 || obj.passcode == 0){
-        const meter = await Meter.findOne({passcode:obj.passcode})
+    if (parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
+        const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const docs = await Meter.find((err,docs)=>{return docs})
-        const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
+        const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.unit = parseInt(obj.unit)
         await Meter.replaceOne(docs[index],meter)
         res.send("SUCCESS")
@@ -58,10 +58,10 @@ exports.post_unit = async(req,res)=>{
 
 exports.post_amount = async(req,res)=>{
     const obj = req.params
-    if(obj.passcode == 1 || obj.passcode == 0){
-        const meter = await Meter.findOne({passcode:obj.passcode})
+    if(parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
+        const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const docs = await Meter.find((err,docs)=>{return docs})
-        const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
+        const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.amount = parseInt(obj.amount)
         await Meter.replaceOne(docs[index],meter)
         res.send("SUCCESS") 
@@ -74,12 +74,11 @@ exports.post_amount = async(req,res)=>{
 exports.calculating_unit = (req,res)=>{
     const obj = req.params
     let val = null
-    if (obj.passcode == 1 || obj.passcode == 0){
-        console.log("test 1")
-        if(obj.passcode == 1){
-            val = unit_setter( obj.passcode,AmountA,obj.amount)
-        }else if (obj.passcode == 0){
-            val = unit_setter( obj.passcode,AmountB,obj.amount)
+    if (parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
+        if(parseInt(obj.passcode) == 1){
+            val = unit_setter( parseInt(obj.passcode),AmountA,obj.amount)
+        }else if (parseInt(obj.passcode) == 0){
+            val = unit_setter( parseInt(obj.passcode),AmountB,obj.amount)
         }
         if (val !== false || val !== null || typeof val !== "undefined"){
             if (val.tokens !== null){
@@ -89,13 +88,12 @@ exports.calculating_unit = (req,res)=>{
                 token = "0"
             }
             res.json({"tokens":token})
-            replace_docs(obj.passcode,val)
+            replace_docs(parseInt(obj.passcode),val)
             
         }else{
             res.json({"tokens":"insufficient balance"})
         }
     }else{
-        console.log("test 2")
         res.json({"tokens":"unmatch password"})
     }
     
@@ -103,10 +101,10 @@ exports.calculating_unit = (req,res)=>{
 }
 exports.set_threshold = async(req,res)=>{
     const obj = req.params
-    if(obj.passcode == 1 || obj.passcode == 0){
-        const meter = await Meter.findOne({passcode:obj.passcode})
+    if(parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
+        const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const docs = await Meter.find((err,docs)=>{return docs})
-        const index = docs.findIndex((docs)=>docs.passcode == obj.passcode)
+        const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.threshold = obj.threshold
         await Meter.replaceOne(docs[index],meter)
         res.json({"status":"SUCCESS"})
@@ -118,8 +116,8 @@ exports.set_threshold = async(req,res)=>{
 
 exports.get_threshold = async(req,res)=>{
     const obj = req.params
-    if(obj.passcode == 1 || obj.passcode == 0){
-        const meter = await Meter.findOne({passcode:obj.passcode})
+    if(parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
+        const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const threshold = meter.threshold
         res.json({"tokens":`${threshold}`})
     }else{
