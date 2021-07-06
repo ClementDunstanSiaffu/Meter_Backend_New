@@ -6,13 +6,13 @@ let token = null
 let AmountA = null
 let AmountB = null
 
-exports.get_tokens = (req,res)=>{
-    if (req.params == 1){
-        const tokens = helper.arr_for_meterA()
-        res.send(tokens)
+exports.get_tokens = async(req,res)=>{
+    const passcode = req.params
+    const meter = await Meter.findOne(passcode)
+    if (meter !== null){
+        res.json({unit:meter.unit})
     }else{
-        const tokens = helper.arr_for_meterB()
-        res.send(tokens)
+        res.json({unit:0})
     }
 }
 
@@ -30,14 +30,13 @@ exports.get_amount = async (req,res)=>{
 }
 
 exports.get_unit = async (req,res)=>{
-    const passcode = req.params
-    if (passcode == 1 || passcode == 0){
-        const passcode = req.params
-        const thatMeter = await Meter.findOne(passcode)
+    const {passcode} = req.params
+    if (parseInt(passcode) == 1 || parseInt(passcode) == 0){
+        const thatMeter = await Meter.findOne({passcode:parseInt(passcode)})
         const unit = thatMeter.unit
-        res.json(unit)
+        res.json({unit:unit})
     }else{
-        res.json(0)
+        res.json({unit:0})
     }
    
 }
@@ -50,9 +49,9 @@ exports.post_unit = async(req,res)=>{
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.unit = parseInt(obj.unit)
         await Meter.replaceOne(docs[index],meter)
-        res.send("SUCCESS")
+        res.json({"status":"SUCCESS"})
     }else{
-        res.send("FAILED")
+        res.json({"status":"FAILED"})
     }
    
 }
@@ -65,9 +64,9 @@ exports.post_amount = async(req,res)=>{
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.amount = parseInt(obj.amount)
         await Meter.replaceOne(docs[index],meter)
-        res.send("SUCCESS") 
+        res.json({"status":"SUCCESS"})
     }else{
-        res.send("FAILED") 
+        res.json({"status":"FAILED"})
     }
     
 }

@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 const meterSchema = mongoose.Schema({
     passcode:{
-        type:String
+        type:Number
     },
     amount:{
         type:Number
