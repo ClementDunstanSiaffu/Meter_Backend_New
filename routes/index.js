@@ -191,8 +191,13 @@ async function replace_docs (passcode,val){
 
 function init(){
     Meter.find((err,docs)=>{
-        AmountA = docs[0].amount;
-        AmountB = docs[1].amount
+        if (typeof docs == "undefined"){
+            init()
+        }else{
+            AmountA = docs[0].amount;
+            AmountB = docs[1].amount
+        }
+    
     })
 }
 
