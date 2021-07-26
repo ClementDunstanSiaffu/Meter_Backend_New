@@ -10,9 +10,9 @@ exports.get_tokens = async(req,res)=>{
     const passcode = req.params
     const meter = await Meter.findOne(passcode)
     if (meter !== null){
-        res.json({unit:meter.unit})
+        res.status(200).json(meter.unit)
     }else{
-        res.json({unit:0})
+        rres.status(200).json(0)
     }
 }
 
@@ -34,9 +34,9 @@ exports.get_unit = async (req,res)=>{
     if (parseInt(passcode) == 1 || parseInt(passcode) == 0){
         const thatMeter = await Meter.findOne({passcode:parseInt(passcode)})
         const unit = thatMeter.unit
-        res.json({unit:unit})
+        res.status(200).json(unit)
     }else{
-        res.json({unit:0})
+        res.status(200).json(0)
     }
    
 }
@@ -49,9 +49,9 @@ exports.post_unit = async(req,res)=>{
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.unit = parseInt(obj.unit)
         await Meter.replaceOne(docs[index],meter)
-        res.json({"status":"SUCCESS"})
+        res.status(200).json("SUCCESS")
     }else{
-        res.json({"status":"FAILED"})
+        res.status(200).json("FAILED")
     }
    
 }
@@ -64,9 +64,9 @@ exports.post_amount = async(req,res)=>{
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.amount = parseInt(obj.amount)
         await Meter.replaceOne(docs[index],meter)
-        res.json({"status":"SUCCESS"})
+        res.status(200).json("SUCCESS")
     }else{
-        res.json({"status":"FAILED"})
+        res.status(200).json("FAILED")
     }
     
 }
@@ -87,14 +87,14 @@ exports.calculating_unit = (req,res)=>{
             }else{
                 token = "0"
             }
-            res.json({"tokens":token})
+            res.json(token)
             replace_docs(parseInt(obj.passcode),val)
             
         }else{
-            res.json({"tokens":"insufficient balance"})
+            res.status(200).json("insufficient balance")
         }
     }else{
-        res.json({"tokens":"unmatch password"})
+        res.status(200).json("unmatch password")
     }
     
     
@@ -107,9 +107,9 @@ exports.set_threshold = async(req,res)=>{
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
         meter.threshold = obj.threshold
         await Meter.replaceOne(docs[index],meter)
-        res.json({"status":"SUCCESS"})
+        res.status(200).json("SUCCESS")
     }else{
-        res.send({"status":"SUCCESS"})
+        res.status(200).json("FAILED")
     }
    
 }
@@ -119,9 +119,9 @@ exports.get_threshold = async(req,res)=>{
     if(parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
         const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const threshold = meter.threshold
-        res.json({"tokens":`${threshold}`})
+        res.json(threshold)
     }else{
-        res.json({"tokens":"0"})
+        res.json(0)
     }
    
 }
