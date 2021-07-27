@@ -167,9 +167,9 @@ exports.get_threshold = async(req,res)=>{
     if(parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
         const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const threshold = meter.threshold
-        res.json(threshold)
+        res.status(200).json(threshold)
     }else{
-        res.json(0)
+        res.status(200).json(0)
     }
    
 }
