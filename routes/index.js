@@ -5,6 +5,7 @@ const Meter = mongoose.model("METER")
 let token = null
 let AmountA = null
 let AmountB = null
+let status = false
 
 exports.get_tokens = async(req,res)=>{
     const passcode = req.params
@@ -25,15 +26,32 @@ exports.get_amount = async (req,res)=>{
     }else{
         res.status(200).json(0)
     }
-  
-
 }
+
+exports.send_unit = async(req,res)=>{
+    const {passcode,flag} = req.params
+    let bool = flag == "true" ? true : false
+    if (status == false){
+        if (passcode == 1 || passcode == 0){
+            const thatMeter = await Meter.findOne({passcode:parseInt(passcode)})
+            const unit = thatMeter.unit
+            status = bool
+            res.status(200).json(unit)
+        }else{
+            res.status(200).json(0)
+        }
+    }else{
+        res.status(200).json(0)
+    }
+}
+
 
 exports.get_unit = async (req,res)=>{
     const {passcode} = req.params
     if (parseInt(passcode) == 1 || parseInt(passcode) == 0){
         const thatMeter = await Meter.findOne({passcode:parseInt(passcode)})
         const unit = thatMeter.unit
+        console.log(unit,"test 2")
         res.status(200).json(unit)
     }else{
         res.status(200).json(0)
@@ -71,25 +89,55 @@ exports.post_amount = async(req,res)=>{
     
 }
 
-exports.calculating_unit = (req,res)=>{
+exports.calculating_unit = async(req,res)=>{
     const obj = req.params
+    let bool = obj.flag == "true" ? true :false
     let val = null
+    let passcode = obj.passcode
+    const meter = await Meter.findOne({passcode:passcode})
+    const docs = await Meter.find((err,docs)=>{return docs})
+    AmountA = docs[0].amount
+    AmountB = docs[1].amount
+    // Meter.find((err,docs)=>{
+    //     if (typeof docs == "undefined"){
+    //         // init()
+    //     }else{
+    //         AmountA = docs[0].amount;
+    //         AmountB = docs[1].amount
+    //     }
+    
+    // })
     if (parseInt(obj.passcode) == 1 || parseInt(obj.passcode) == 0){
         if(parseInt(obj.passcode) == 1){
             val = unit_setter( parseInt(obj.passcode),AmountA,obj.amount)
         }else if (parseInt(obj.passcode) == 0){
             val = unit_setter( parseInt(obj.passcode),AmountB,obj.amount)
         }
-        if (val !== false || val !== null || typeof val !== "undefined"){
-            if (val.tokens !== null){
-                    token = val.tokens
-                    val.tokens = null
+        if (val !== false ){
+            if (val !== null ){
+                if (typeof val !== "undefined"){
+                    if (val.tokens !== null){
+                        token = val.tokens
+                        val.tokens = null
+                    }else{
+                        token = "0"
+                    }
+                    status = bool            
+                    const index = docs.findIndex((docs)=>docs.passcode == passcode)
+                    if (index !== -1){
+                        meter.unit = parseInt(val.unit)
+                        meter.amount -= parseInt(val.amount)
+                        await Meter.replaceOne(docs[index],meter)
+                    }
+                    // replace_docs(parseInt(obj.passcode),val)
+                    res.status(200).json(token)
+                }else{
+                    res.status(200).json("insufficient balance")
+                }
             }else{
-                token = "0"
+                res.status(200).json("insufficient balance")
             }
-            res.json(token)
-            replace_docs(parseInt(obj.passcode),val)
-            
+      
         }else{
             res.status(200).json("insufficient balance")
         }
@@ -127,6 +175,7 @@ exports.get_threshold = async(req,res)=>{
 }
 
 function unit_setter(passcode,meterAmount,amount){
+    
     if(meterAmount !== null){
         if (meterAmount >= amount){
             const unit = parseInt(amount/300)
@@ -178,27 +227,27 @@ function unit_setter(passcode,meterAmount,amount){
     }
 }
 
-async function replace_docs (passcode,val){
-    const meter = await Meter.findOne({passcode:passcode})
-    const docs = await Meter.find((err,docs)=>{return docs})
-    const index = docs.findIndex((docs)=>docs.passcode == passcode)
-    if (index !== -1){
-        meter.unit = parseInt(val.unit)
-        meter.amount -= parseInt(val.amount)
-        await Meter.replaceOne(docs[index],meter)
-    }
-}
+// async function replace_docs (passcode,val){
+//     const meter = await Meter.findOne({passcode:passcode})
+//     const docs = await Meter.find((err,docs)=>{return docs})
+//     const index = docs.findIndex((docs)=>docs.passcode == passcode)
+//     if (index !== -1){
+//         meter.unit = parseInt(val.unit)
+//         meter.amount -= parseInt(val.amount)
+//         await Meter.replaceOne(docs[index],meter)
+//     }
+// }
 
-function init(){
-    Meter.find((err,docs)=>{
-        if (typeof docs == "undefined"){
-            init()
-        }else{
-            AmountA = docs[0].amount;
-            AmountB = docs[1].amount
-        }
+// function init(){
+//     Meter.find((err,docs)=>{
+//         if (typeof docs == "undefined"){
+//             init()
+//         }else{
+//             AmountA = docs[0].amount;
+//             AmountB = docs[1].amount
+//         }
     
-    })
-}
+//     })
+// }
 
-init()
+// init()
