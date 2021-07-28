@@ -50,8 +50,7 @@ exports.get_unit = async (req,res)=>{
     const {passcode} = req.params
     if (parseInt(passcode) == 1 || parseInt(passcode) == 0){
         const thatMeter = await Meter.findOne({passcode:parseInt(passcode)})
-        const unit = thatMeter.unit
-        console.log(unit,"test 2")
+        const unit = thatMeter.meterUnit
         res.status(200).json(unit)
     }else{
         res.status(200).json(0)
@@ -65,7 +64,7 @@ exports.post_unit = async(req,res)=>{
         const meter = await Meter.findOne({passcode:parseInt(obj.passcode)})
         const docs = await Meter.find((err,docs)=>{return docs})
         const index = docs.findIndex((docs)=>docs.passcode == parseInt(obj.passcode))
-        meter.unit = parseInt(obj.unit)
+        meter.meterUnit = parseInt(obj.unit)
         await Meter.replaceOne(docs[index],meter)
         res.status(200).json("SUCCESS")
     }else{

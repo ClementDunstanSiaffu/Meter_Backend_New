@@ -10,6 +10,9 @@ const meterSchema = mongoose.Schema({
     unit:{
         type:Number
     },
+    meterUnit:{
+        type:Number
+    },
     threshold:{
         type:Number
     },
